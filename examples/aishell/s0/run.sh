@@ -24,11 +24,11 @@ num_nodes=1
 node_rank=0
 # The aishell dataset location, please change this to your own path
 # make sure of using absolute path. DO-NOT-USE relatvie path!
-data=/export/data/asr-data/OpenSLR/33/
+data=/home/jasmine/data
 data_url=www.openslr.org/resources/33
 
 nj=16
-dict=data/dict/lang_char.txt
+dict=/home/jasmine/data/data_aishell/vocab.txt
 
 # data_type can be `raw` or `shard`. Typically, raw is used for small dataset,
 # `shard` is used for large dataset which is over 1k hours, and `shard` is
