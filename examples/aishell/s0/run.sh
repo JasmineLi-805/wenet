@@ -28,7 +28,7 @@ data=/home/jasmine/data
 data_url=www.openslr.org/resources/33
 
 nj=16
-dict=/home/jasmine/data/data_aishell/vocab.txt
+dict=data/dict/lang_char.txt
 
 # data_type can be `raw` or `shard`. Typically, raw is used for small dataset,
 # `shard` is used for large dataset which is over 1k hours, and `shard` is
@@ -63,13 +63,15 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
   local/download_and_untar.sh ${data} ${data_url} resource_aishell
 fi
 
+# creates the data/ directory in the working directory
+# prepares the filename->path and filename->transcription information
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   # Data preparation
   local/aishell_data_prep.sh ${data}/data_aishell/wav \
     ${data}/data_aishell/transcript
 fi
 
-
+# remove the space in ./data/train/text, ./data/test/text, ./data/dev/text
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   # remove the space between the text labels for Mandarin dataset
   for x in train dev test; do
