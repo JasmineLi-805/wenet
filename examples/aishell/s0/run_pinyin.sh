@@ -72,6 +72,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
 fi
 
 # remove the space in ./data/train/text, ./data/test/text, ./data/dev/text
+# convert the labels to toneless pinyin
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   # remove the space between the text labels for Mandarin dataset
   for x in train dev test; do
