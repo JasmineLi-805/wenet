@@ -5,7 +5,7 @@
 
 # Use this to control how many gpu you use, It's 1-gpu training if you specify
 # just 1gpu, otherwise it's is multiple gpu training based on DDP in pytorch
-export CUDA_VISIBLE_DEVICES="0"
+export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 # The NCCL_SOCKET_IFNAME variable specifies which IP interface to use for nccl
 # communication. More details can be found in
 # https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/env.html
@@ -89,17 +89,19 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     --out_cmvn data/$train_set/global_cmvn
 fi
 
-if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
-  echo "Make a dictionary"
-  mkdir -p $(dirname $dict)
-  echo "<blank> 0" > ${dict}  # 0 is for "blank" in CTC
-  echo "<unk> 1"  >> ${dict}  # <unk> must be 1
-  tools/text2token.py -s 1 -n 1 data/train/text | cut -f 2- -d" " \
-    | tr " " "\n" | sort | uniq | grep -a -v -e '^\s*$' | \
-    awk '{print $0 " " NR+1}' >> ${dict}
-  num_token=$(cat $dict | wc -l)
-  echo "<sos/eos> $num_token" >> $dict
-fi
+# Don't run 2 if using toneless pinyin
+
+# if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
+#   echo "Make a dictionary"
+#   mkdir -p $(dirname $dict)
+#   echo "<blank> 0" > ${dict}  # 0 is for "blank" in CTC
+#   echo "<unk> 1"  >> ${dict}  # <unk> must be 1
+#   tools/text2token.py -s 1 -n 1 data/train/text | cut -f 2- -d" " \
+#     | tr " " "\n" | sort | uniq | grep -a -v -e '^\s*$' | \
+#     awk '{print $0 " " NR+1}' >> ${dict}
+#   num_token=$(cat $dict | wc -l)
+#   echo "<sos/eos> $num_token" >> $dict
+# fi
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   echo "Prepare data, prepare requried format"
