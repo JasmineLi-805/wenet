@@ -28,7 +28,7 @@ data=/home/jasmine/data
 data_url=www.openslr.org/resources/33
 
 nj=16
-dict=data/dict/dict_pinyin_toneless.txt
+dict=dict_pinyin_toneless.txt
 
 # data_type can be `raw` or `shard`. Typically, raw is used for small dataset,
 # `shard` is used for large dataset which is over 1k hours, and `shard` is
