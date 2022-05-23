@@ -22,7 +22,6 @@ with open(read_file_name, 'r') as file:
 
         pred = pypinyin.pinyin(character, style=pypinyin.Style.NORMAL, neutral_tone_with_five=True)
         pred = [p[0] for p in pred]
-        pred = ' '.join(pred)
         pred = pred.upper()
         # print(pred)
 
