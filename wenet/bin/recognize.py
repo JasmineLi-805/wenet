@@ -177,47 +177,50 @@ def main():
             target = target.to(device)
             feats_lengths = feats_lengths.to(device)
             target_lengths = target_lengths.to(device)
-            if args.mode == 'attention':
-                hyps, _ = model.recognize(
-                    feats,
-                    feats_lengths,
-                    beam_size=args.beam_size,
-                    decoding_chunk_size=args.decoding_chunk_size,
-                    num_decoding_left_chunks=args.num_decoding_left_chunks,
-                    simulate_streaming=args.simulate_streaming)
-                hyps = [hyp.tolist() for hyp in hyps]
-            elif args.mode == 'ctc_greedy_search':
-                hyps, _ = model.ctc_greedy_search(
-                    feats,
-                    feats_lengths,
-                    decoding_chunk_size=args.decoding_chunk_size,
-                    num_decoding_left_chunks=args.num_decoding_left_chunks,
-                    simulate_streaming=args.simulate_streaming)
-            # ctc_prefix_beam_search and attention_rescoring only return one
-            # result in List[int], change it to List[List[int]] for compatible
-            # with other batch decoding mode
-            elif args.mode == 'ctc_prefix_beam_search':
-                assert (feats.size(0) == 1)
-                hyp, _ = model.ctc_prefix_beam_search(
-                    feats,
-                    feats_lengths,
-                    args.beam_size,
-                    decoding_chunk_size=args.decoding_chunk_size,
-                    num_decoding_left_chunks=args.num_decoding_left_chunks,
-                    simulate_streaming=args.simulate_streaming)
-                hyps = [hyp]
-            elif args.mode == 'attention_rescoring':
-                assert (feats.size(0) == 1)
-                hyp, _ = model.attention_rescoring(
-                    feats,
-                    feats_lengths,
-                    args.beam_size,
-                    decoding_chunk_size=args.decoding_chunk_size,
-                    num_decoding_left_chunks=args.num_decoding_left_chunks,
-                    ctc_weight=args.ctc_weight,
-                    simulate_streaming=args.simulate_streaming,
-                    reverse_weight=args.reverse_weight)
-                hyps = [hyp]
+            try:
+                if args.mode == 'attention':
+                    hyps, _ = model.recognize(
+                        feats,
+                        feats_lengths,
+                        beam_size=args.beam_size,
+                        decoding_chunk_size=args.decoding_chunk_size,
+                        num_decoding_left_chunks=args.num_decoding_left_chunks,
+                        simulate_streaming=args.simulate_streaming)
+                    hyps = [hyp.tolist() for hyp in hyps]
+                elif args.mode == 'ctc_greedy_search':
+                    hyps, _ = model.ctc_greedy_search(
+                        feats,
+                        feats_lengths,
+                        decoding_chunk_size=args.decoding_chunk_size,
+                        num_decoding_left_chunks=args.num_decoding_left_chunks,
+                        simulate_streaming=args.simulate_streaming)
+                # ctc_prefix_beam_search and attention_rescoring only return one
+                # result in List[int], change it to List[List[int]] for compatible
+                # with other batch decoding mode
+                elif args.mode == 'ctc_prefix_beam_search':
+                    assert (feats.size(0) == 1)
+                    hyp, _ = model.ctc_prefix_beam_search(
+                        feats,
+                        feats_lengths,
+                        args.beam_size,
+                        decoding_chunk_size=args.decoding_chunk_size,
+                        num_decoding_left_chunks=args.num_decoding_left_chunks,
+                        simulate_streaming=args.simulate_streaming)
+                    hyps = [hyp]
+                elif args.mode == 'attention_rescoring':
+                    assert (feats.size(0) == 1)
+                    hyp, _ = model.attention_rescoring(
+                        feats,
+                        feats_lengths,
+                        args.beam_size,
+                        decoding_chunk_size=args.decoding_chunk_size,
+                        num_decoding_left_chunks=args.num_decoding_left_chunks,
+                        ctc_weight=args.ctc_weight,
+                        simulate_streaming=args.simulate_streaming,
+                        reverse_weight=args.reverse_weight)
+                    hyps = [hyp]
+            except:
+                print(f'feature size error batch idx={batch_idx}')
             for i, key in enumerate(keys):
                 content = []
                 for w in hyps[i]:

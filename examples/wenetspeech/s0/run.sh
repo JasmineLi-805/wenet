@@ -17,9 +17,9 @@ num_nodes=1
 node_rank=0
 
 # Use your own data path. You need to download the WenetSpeech dataset by yourself.
-wenetspeech_data_dir=/ssd/nfs07/binbinzhang/wenetspeech
+wenetspeech_data_dir=/nfs/ssd12/data/audio/WenetSpeechUnzip
 # Make sure you have 1.2T for ${shards_dir}
-shards_dir=/ssd/nfs06/unified_data/wenetspeech_shards
+shards_dir=/nfs/ssd12/data/audio
 
 # WenetSpeech training set
 set=L
@@ -27,16 +27,16 @@ train_set=train_`echo $set | tr 'A-Z' 'a-z'`
 dev_set=dev
 test_sets="test_net test_meeting"
 
-train_config=conf/train_conformer.yaml
-checkpoint=
+train_config=20211025_conformer_exp/train.yaml
+checkpoint=20211025_conformer_exp/final.pt
 cmvn=true
 cmvn_sampling_divisor=20 # 20 means 5% of the training data to estimate cmvn
-dir=exp/conformer
+dir=20211025_conformer_exp/
 
-decode_checkpoint=
-average_checkpoint=true
+decode_checkpoint=20211025_conformer_exp/final.pt
+average_checkpoint=false
 average_num=10
-decode_modes="attention_rescoring ctc_greedy_search"
+decode_modes="attention ttention_rescoring ctc_greedy_search"
 
 . tools/parse_options.sh || exit 1;
 
@@ -57,7 +57,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     data || exit 1;
 fi
 
-dict=data/dict/lang_char.txt
+dict=20211025_conformer_exp/words.txt
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     echo "Make a dictionary"
     echo "dictionary: ${dict}"
@@ -191,7 +191,7 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
         --result_file $result_dir/text \
         ${decoding_chunk_size:+--decoding_chunk_size $decoding_chunk_size}
       python tools/compute-wer.py --char=1 --v=1 \
-        $feat_dir/$testset/text $result_dir/text > $result_dir/wer
+        data/$testset/text $result_dir/text > $result_dir/wer
     }
     done
     wait
