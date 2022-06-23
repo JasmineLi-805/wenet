@@ -40,6 +40,10 @@ decode_modes="attention ttention_rescoring ctc_greedy_search"
 
 . tools/parse_options.sh || exit 1;
 
+# bpemode (unigram or bpe)
+nbpe=1024
+bpemode=unigram
+
 set -u
 set -o pipefail
 
@@ -60,7 +64,8 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   done
 fi
 
-dict=20211025_conformer_exp/words.txt
+dict=$wave_data/lang_char/${train_set}_${bpemode}${nbpe}_units.txt
+bpemodel=$wave_data/lang_char/${train_set}_${bpemode}${nbpe}
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     echo "Make a dictionary"
     echo "dictionary: ${dict}"

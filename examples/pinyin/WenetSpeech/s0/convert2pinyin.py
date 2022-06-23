@@ -17,16 +17,16 @@ with open(read_file_name, 'r') as file:
         if not line or line[0] == '\n' or line[0] == '#':
             continue
 
-        l = line[:-1].split(' ')
+        l = line[:-1].split('  ')
         filename, character = l
 
         pred = pypinyin.pinyin(character, style=pypinyin.Style.NORMAL, neutral_tone_with_five=True)
         pred = [p[0] for p in pred]
-        pred = ''.join(pred)
+        pred = ' '.join(pred)
         pred = pred.upper()
         # print(pred)
 
-        buffer.append(' '.join([filename, pred]))
+        buffer.append('  '.join([filename, pred]))
         
 
 with open(write_file_name,'w') as ef:
