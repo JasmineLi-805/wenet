@@ -57,6 +57,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     data || exit 1;
   for x in dev test_meeting test_net train_l; do
     python convert2pinyin.py --input data/${x}/text --output data/${x}/text
+  done
 fi
 
 dict=20211025_conformer_exp/words.txt
