@@ -17,7 +17,7 @@ with open(read_file_name, 'r') as file:
         if not line or line[0] == '\n' or line[0] == '#':
             continue
 
-        l = line[:-1].split('  ')
+        l = line[:-1].split('\t')
         filename, character = l
 
         pred = pypinyin.pinyin(character, style=pypinyin.Style.NORMAL, neutral_tone_with_five=True)
@@ -26,7 +26,7 @@ with open(read_file_name, 'r') as file:
         pred = pred.upper()
         # print(pred)
 
-        buffer.append('  '.join([filename, pred]))
+        buffer.append('\t'.join([filename, pred]))
         
 
 with open(write_file_name,'w') as ef:
