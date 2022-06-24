@@ -42,7 +42,7 @@ decode_modes="attention ttention_rescoring ctc_greedy_search"
 
 # bpemode (unigram or word or bpe)
 nbpe=1024
-bpemode=unigram
+bpemode=word
 
 # create shards
 shard=false
@@ -75,16 +75,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     mkdir -p $(dirname $dict)
     echo "<blank> 0" > ${dict} # 0 will be used for "blank" in CTC
     echo "<unk> 1" >> ${dict} # <unk> must be 1
-    # echo "▁ 2" >> ${dict} # ▁ is for space
-    # tools/text2token.py -s 1 -n 1 --space "▁" data/${train_set}/text \
-    #     | cut -f 2- -d" " | tr " " "\n" \
-    #     | sort | uniq | grep -a -v -e '^\s*$' \
-    #     | grep -v "▁" \
-    #     | awk '{print $0 " " NR+2}' >> ${dict} \
-    #     || exit 1;
-    # num_token=$(cat $dict | wc -l)
-    # echo "<sos/eos> $num_token" >> $dict
-
+    
     mkdir -p data/lang_char/
     cut -f 2- -d" " data/${train_set}/text > data/lang_char/input.txt
     tools/spm_train --input=data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
@@ -94,23 +85,23 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     wc -l ${dict}
 fi
 
-if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
-  echo "Compute cmvn"
-  # Here we use all the training data, you can sample some some data to save time
-  # BUG!!! We should use the segmented data for CMVN
-  if $cmvn; then
-    full_size=`cat data/${train_set}/wav.scp | wc -l`
-    sampling_size=$((full_size / cmvn_sampling_divisor))
-    shuf -n $sampling_size data/$train_set/wav.scp \
-      > data/$train_set/wav.scp.sampled
-    python3 tools/compute_cmvn_stats.py \
-    --num_workers 16 \
-    --train_config $train_config \
-    --in_scp data/$train_set/wav.scp.sampled \
-    --out_cmvn data/$train_set/global_cmvn \
-    || exit 1;
-  fi
-fi
+# if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
+#   echo "Compute cmvn"
+#   # Here we use all the training data, you can sample some some data to save time
+#   # BUG!!! We should use the segmented data for CMVN
+#   if $cmvn; then
+#     full_size=`cat data/${train_set}/wav.scp | wc -l`
+#     sampling_size=$((full_size / cmvn_sampling_divisor))
+#     shuf -n $sampling_size data/$train_set/wav.scp \
+#       > data/$train_set/wav.scp.sampled
+#     python3 tools/compute_cmvn_stats.py \
+#     --num_workers 16 \
+#     --train_config $train_config \
+#     --in_scp data/$train_set/wav.scp.sampled \
+#     --out_cmvn data/$train_set/global_cmvn \
+#     || exit 1;
+#   fi
+# fi
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   if $cmvn; then
