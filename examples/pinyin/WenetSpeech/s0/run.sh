@@ -27,13 +27,13 @@ train_set=train_`echo $set | tr 'A-Z' 'a-z'`
 dev_set=dev
 test_sets="test_net test_meeting"
 
-train_config=20211025_conformer_exp/train.yaml
-checkpoint=20211025_conformer_exp/final.pt
+train_config=conf/train_conformer.yaml
+checkpoint=
 cmvn=false
 cmvn_sampling_divisor=20 # 20 means 5% of the training data to estimate cmvn
-dir=20211025_conformer_exp/
+dir=result/
 
-decode_checkpoint=20211025_conformer_exp/final.pt
+decode_checkpoint=
 average_checkpoint=false
 average_num=10
 decode_modes="attention ttention_rescoring ctc_greedy_search"
