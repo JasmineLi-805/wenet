@@ -64,8 +64,8 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   done
 fi
 
-dict=$wave_data/lang_char/${train_set}_${bpemode}${nbpe}_units.txt
-bpemodel=$wave_data/lang_char/${train_set}_${bpemode}${nbpe}
+dict=data/lang_char/${train_set}_${bpemode}${nbpe}_units.txt
+bpemodel=data/lang_char/${train_set}_${bpemode}${nbpe}
 if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     echo "Make a dictionary"
     echo "dictionary: ${dict}"
@@ -83,9 +83,9 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     # echo "<sos/eos> $num_token" >> $dict
 
     mkdir -p data/lang_char/
-    cut -f 2- -d" " $wave_data/${train_set}/text > $wave_data/lang_char/input.txt
-    tools/spm_train --input=$wave_data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
-    tools/spm_encode --model=${bpemodel}.model --output_format=piece < $wave_data/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >> ${dict}
+    cut -f 2- -d" " data/${train_set}/text > data/lang_char/input.txt
+    tools/spm_train --input=data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
+    tools/spm_encode --model=${bpemodel}.model --output_format=piece < data/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >> ${dict}
     num_token=$(cat $dict | wc -l)
     echo "<sos/eos> $num_token" >> $dict # <eos>
     wc -l ${dict}
