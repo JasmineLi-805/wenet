@@ -40,7 +40,7 @@ decode_modes="attention ttention_rescoring ctc_greedy_search"
 
 . tools/parse_options.sh || exit 1;
 
-# bpemode (unigram or bpe)
+# bpemode (unigram or word or bpe)
 nbpe=1024
 bpemode=unigram
 
@@ -162,7 +162,7 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
     rank=`expr $node_rank \* $num_gpus + $i`
     python wenet/bin/train.py --gpu $gpu_id \
       --config $train_config \
-      --data_type "shard" \
+      --data_type "raw" \
       --symbol_table $dict \
       --train_data data/$train_set/data.list \
       --cv_data data/$dev_set/data.list \
