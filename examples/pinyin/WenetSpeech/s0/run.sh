@@ -44,6 +44,9 @@ decode_modes="attention ttention_rescoring ctc_greedy_search"
 nbpe=1024
 bpemode=unigram
 
+# create shards
+shard=false
+
 set -u
 set -o pipefail
 
@@ -110,19 +113,27 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
 fi
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
-  echo "Making shards, please wait..."
-  RED='\033[0;31m'
-  NOCOLOR='\033[0m'
-  echo -e "It requires ${RED}1.2T ${NOCOLOR}space for $shards_dir, please make sure you have enough space"
-  echo -e "It takes about ${RED}12 ${NOCOLOR}hours with 32 threads"
-  for x in $dev_set $test_sets ${train_set}; do
-    dst=$shards_dir/$x
-    mkdir -p $dst
-    tools/make_shard_list.py --resample 16000 --num_utts_per_shard 1000 \
-      --num_threads 32 --segments data/$x/segments \
-      data/$x/wav.scp data/$x/text \
-      $(realpath $dst) data/$x/data.list
-  done
+  if $cmvn; then
+    echo "Making shards, please wait..."
+    RED='\033[0;31m'
+    NOCOLOR='\033[0m'
+    echo -e "It requires ${RED}1.2T ${NOCOLOR}space for $shards_dir, please make sure you have enough space"
+    echo -e "It takes about ${RED}12 ${NOCOLOR}hours with 32 threads"
+    for x in $dev_set $test_sets ${train_set}; do
+      dst=$shards_dir/$x
+      mkdir -p $dst
+      tools/make_shard_list.py --resample 16000 --num_utts_per_shard 1000 \
+        --num_threads 32 --segments data/$x/segments \
+        data/$x/wav.scp data/$x/text \
+        $(realpath $dst) data/$x/data.list
+    done
+  else
+    echo "Prepare data, prepare requried format"
+    for x in $dev_set $test_sets ${train_set}; do
+      tools/make_raw_list.py data/$x/wav.scp data/$x/text \
+          data/$x/data.list
+    done
+  fi
 fi
 
 if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
