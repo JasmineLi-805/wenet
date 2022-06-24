@@ -29,7 +29,7 @@ test_sets="test_net test_meeting"
 
 train_config=20211025_conformer_exp/train.yaml
 checkpoint=20211025_conformer_exp/final.pt
-cmvn=true
+cmvn=false
 cmvn_sampling_divisor=20 # 20 means 5% of the training data to estimate cmvn
 dir=20211025_conformer_exp/
 
