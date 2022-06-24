@@ -131,7 +131,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     echo "Prepare data, prepare requried format"
     for x in $dev_set $test_sets ${train_set}; do
       tools/make_raw_list.py data/$x/wav.scp data/$x/text \
-          data/$x/data.list --segments --segments data/$x/segments
+          data/$x/data.list --segments data/$x/segments
     done
   fi
 fi
