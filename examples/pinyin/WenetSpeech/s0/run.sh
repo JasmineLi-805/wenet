@@ -42,7 +42,7 @@ decode_modes="attention ttention_rescoring ctc_greedy_search"
 
 # bpemode (unigram or word or bpe)
 nbpe=1024
-bpemode=word
+bpemode=bpe
 
 # create shards
 shard=false
