@@ -77,7 +77,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     echo "<unk> 1" >> ${dict} # <unk> must be 1
     
     mkdir -p data/lang_char/
-    cut -f 2- -d" " data/${train_set}/text > data/lang_char/input.txt
+    python extract_text.py --input data/${train_set}/text --output data/lang_char/input.txt
     tools/spm_train --input=data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
     tools/spm_encode --model=${bpemodel}.model --output_format=piece < data/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >> ${dict}
     num_token=$(cat $dict | wc -l)
