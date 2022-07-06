@@ -17,12 +17,14 @@ with open(read_file_name, 'r') as file:
         if not line or line[0] == '\n' or line[0] == '#':
             continue
 
-        l = line[:-1].split('\t')
+        if line[-1] == '\n':
+            line = line[:-1]
+        l = line.split('\t')
         filename, character = l
 
-        pred = pypinyin.pinyin(character, style=pypinyin.Style.NORMAL, neutral_tone_with_five=True)
+        pred = pypinyin.pinyin(character, style=pypinyin.Style.NORMAL, neutral_tone_with_five=True, errors=lambda x: 'non-character')
         pred = [p[0] for p in pred]
-        if len(pred) == 1:
+        if len(pred) == 1 or 'non-character' in pred:
             continue
         pred = ' '.join(pred)
         pred = pred.upper()
