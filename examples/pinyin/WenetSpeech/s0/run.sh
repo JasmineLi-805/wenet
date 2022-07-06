@@ -31,6 +31,7 @@ train_config=conf/train_conformer.yaml
 checkpoint=
 cmvn=false
 cmvn_sampling_divisor=20 # 20 means 5% of the training data to estimate cmvn
+shard=false
 dir=result/
 
 decode_checkpoint=
@@ -85,23 +86,25 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     wc -l ${dict}
 fi
 
-# if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
-#   echo "Compute cmvn"
-#   # Here we use all the training data, you can sample some some data to save time
-#   # BUG!!! We should use the segmented data for CMVN
-#   if $cmvn; then
-#     full_size=`cat data/${train_set}/wav.scp | wc -l`
-#     sampling_size=$((full_size / cmvn_sampling_divisor))
-#     shuf -n $sampling_size data/$train_set/wav.scp \
-#       > data/$train_set/wav.scp.sampled
-#     python3 tools/compute_cmvn_stats.py \
-#     --num_workers 16 \
-#     --train_config $train_config \
-#     --in_scp data/$train_set/wav.scp.sampled \
-#     --out_cmvn data/$train_set/global_cmvn \
-#     || exit 1;
-#   fi
-# fi
+if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
+  # Here we use all the training data, you can sample some some data to save time
+  # BUG!!! We should use the segmented data for CMVN
+  if $cmvn; then
+    echo "Compute cmvn"
+    full_size=`cat data/${train_set}/wav.scp | wc -l`
+    sampling_size=$((full_size / cmvn_sampling_divisor))
+    shuf -n $sampling_size data/$train_set/wav.scp \
+      > data/$train_set/wav.scp.sampled
+    python3 tools/compute_cmvn_stats.py \
+    --num_workers 16 \
+    --train_config $train_config \
+    --in_scp data/$train_set/wav.scp.sampled \
+    --out_cmvn data/$train_set/global_cmvn \
+    || exit 1;
+  else
+    echo "Not computing cmvn, skip..."
+  fi
+fi
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   if $cmvn; then
@@ -119,7 +122,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
         $(realpath $dst) data/$x/data.list
     done
   else
-    echo "Prepare data, prepare requried format"
+    echo "not using shards, preparing required data format..."
     for x in $dev_set $test_sets ${train_set}; do
       tools/make_raw_list.py data/$x/wav.scp data/$x/text \
           data/$x/data.list --segments data/$x/segments
