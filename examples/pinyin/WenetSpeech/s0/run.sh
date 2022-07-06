@@ -36,12 +36,12 @@ dir=result/
 decode_checkpoint=
 average_checkpoint=false
 average_num=10
-decode_modes="attention ttention_rescoring ctc_greedy_search"
+decode_modes="attention attention_rescoring ctc_greedy_search"
 
 . tools/parse_options.sh || exit 1;
 
 # bpemode (unigram or word or bpe)
-nbpe=1024
+nbpe=450
 bpemode=bpe
 
 # create shards

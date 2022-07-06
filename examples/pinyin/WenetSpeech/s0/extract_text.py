@@ -17,6 +17,8 @@ with open(read_file_name, 'r') as file:
             continue
 
         l = line.split('\t')
+        if len(l) < 2:
+            continue
         filename, text = l
         
         buffer.append(text)
